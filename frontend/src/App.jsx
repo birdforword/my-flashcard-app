@@ -10,6 +10,7 @@ import CardForm         from './components/CardForm';
 import CaptionsList     from './components/CaptionsList';
 import ExportButton     from './components/ExportButton';
 import UploadSubtitles  from './components/UploadSubtitles';
+import SubtitleOverlay  from './components/SubtitleOverlay';
 
 function App() {
   const [status, setStatus]       = useState('');
@@ -20,15 +21,14 @@ function App() {
   const [selected, setSelected]   = useState(null);
   const [player, setPlayer]       = useState(null);
 
-  // バックエンド健康チェック＋カード一覧取得
+  // 初回とカード更新時
   const refresh = () => {
     fetchHealth().then(setStatus);
     fetchCards().then(setCards);
   };
-
   useEffect(refresh, []);
 
-  // videoIdが変わったら自動的にキャプションを取る or クリア
+  // videoId が変わったら自動取得
   useEffect(() => {
     if (!videoId) {
       setCaptions([]);
@@ -39,12 +39,9 @@ function App() {
       .catch(() => setCaptions([]));
   }, [videoId]);
 
-  // SRT/VTTアップロード後のコール
-  const handleUpload = parsedCaptions => {
-    setCaptions(parsedCaptions);
-  };
+  // 手動アップロード後
+  const handleUpload = parsed => setCaptions(parsed);
 
-  // YouTube URL/ID からvideoId抽出
   const extractVideoId = input => {
     try {
       const url = new URL(input);
@@ -55,7 +52,6 @@ function App() {
       return input.trim();
     }
   };
-
   const onSearch = () => {
     const id = extractVideoId(inputText);
     if (id) setVideoId(id);
@@ -64,9 +60,6 @@ function App() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl mb-4">Flashcard App</h1>
-      <p>サーバーステータス: {status}</p>
-
       {/* 検索フォーム */}
       <div className="mb-4 flex items-center space-x-2">
         <input
@@ -83,7 +76,7 @@ function App() {
         </button>
       </div>
 
-      {/* 動画プレビュー */}
+      {/* 動画プレイヤー */}
       {videoId && (
         <Player
           key={videoId}
@@ -92,21 +85,26 @@ function App() {
         />
       )}
 
-      {/* 自動取得が空のときは手動アップロード */}
-      {captions.length === 0 && videoId && (
+      {/* 字幕：自動取得 or 手動アップロード */}
+      {videoId && captions.length === 0 && (
         <UploadSubtitles onParsed={handleUpload} />
       )}
+      {videoId && captions.length > 0 && (
+        <>
+          {/* 動画下のリアルタイム字幕 */}
+          <SubtitleOverlay player={player} captions={captions} />
+          {/* 字幕リスト */}
+          <CaptionsList
+            captions={captions}
+            onSelect={c => {
+              setSelected(c);
+              if (player) player.seekTo(c.offset, true);
+            }}
+          />
+        </>
+      )}
 
-      {/* 字幕リスト */}
-      <CaptionsList
-        captions={captions}
-        onSelect={c => {
-          setSelected(c);
-          if (player) player.seekTo(c.offset, true);
-        }}
-      />
-
-      {/* 選択した字幕を初期値にしたカードフォーム */}
+      {/* カードフォーム */}
       <CardForm
         onCreated={refresh}
         videoId={videoId}
@@ -114,7 +112,7 @@ function App() {
         initialTimeSec={selected?.offset || null}
       />
 
-      {/* カード一覧 */}
+      {/* カード一覧 & エクスポート */}
       <h2 className="mt-6 text-xl">Cards</h2>
       <ul className="list-disc pl-5">
         {cards.map(c => (
@@ -123,7 +121,6 @@ function App() {
           </li>
         ))}
       </ul>
-
       <ExportButton />
     </div>
   );

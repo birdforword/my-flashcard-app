@@ -7,6 +7,7 @@ import captionsRouter from './routes/captions.js';
 import exportRouter   from './routes/export.js';
 import videosRouter from './routes/videos.js';
 import subtitlesRouter from './routes/subtitles.js';
+import deckRouter from './routes/deckRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,7 @@ app.use('/api/cards',    cardsRouter);
 app.use('/api/captions', captionsRouter);
 app.use('/api/export',   exportRouter);
 app.use('/api/subtitles', subtitlesRouter);
+app.use('/api/decks', deckRouter);
 
 sequelize.sync().then(() => {
   console.log('🗄️ DB synced');
