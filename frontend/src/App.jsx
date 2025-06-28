@@ -6,7 +6,8 @@ import {
   fetchCaptions,
   fetchDecks,
   createDeck,
-  deleteDeck
+  deleteDeck,
+  createCard
 } from './services/api';
 import Player          from './components/Player';
 import SubtitleOverlay from './components/SubtitleOverlay';
@@ -27,6 +28,8 @@ function App() {
   const [captions,  setCaptions]  = useState([]);
   const [selected,  setSelected]  = useState(null);
   const [player,    setPlayer]    = useState(null);
+  const [startTime, setStartTime] = useState(null);
+  const [currTime,  setCurrTime]  = useState(0);
 
   // ── デッキ一覧取得 ────────────────────────────
   useEffect(() => {
@@ -53,6 +56,21 @@ function App() {
       .then(setCaptions)
       .catch(() => setCaptions([]));
   }, [videoId]);
+
+  // ── プレイヤーの現在時刻更新 ─────────────────────
+  useEffect(() => {
+    if (!player) return;
+    const id = setInterval(() => {
+      setCurrTime(player.getCurrentTime());
+    }, 500);
+    return () => clearInterval(id);
+  }, [player]);
+
+  const handleStateChange = state => {
+    if (state === 1 && player) {
+      setStartTime(player.getCurrentTime());
+    }
+  };
 
   // ── イベントハンドラ ───────────────────────────
   const onSearch = () => {
@@ -116,7 +134,42 @@ function App() {
 
       {/* 動画プレイヤー */}
       {videoId && (
-        <Player key={videoId} videoId={videoId} onReady={setPlayer} />
+        <Player
+          key={videoId}
+          videoId={videoId}
+          onReady={setPlayer}
+          onStateChange={handleStateChange}
+        />
+      )}
+
+      {player && (
+        <div className="flex items-center space-x-4">
+          <span className="font-mono text-sm">
+            Start: {startTime !== null ? startTime.toFixed(2) : '--'}s
+          </span>
+          <span className="font-mono text-sm">
+            Now: {currTime.toFixed(2)}s
+          </span>
+          {currentDeck && (
+            <button
+              className="bg-green-500 text-white px-3 py-1 rounded"
+              onClick={async () => {
+                if (startTime === null) return;
+                await createCard({
+                  deckId: currentDeck,
+                  videoId,
+                  timeSec: startTime,
+                  frontText: `{{Start}}${startTime.toFixed(2)}`,
+                  backText: `{{End}}${currTime.toFixed(2)}`,
+                  thumbnail: null,
+                });
+                fetchCards(currentDeck).then(setCards);
+              }}
+            >
+              作成
+            </button>
+          )}
+        </div>
       )}
 
       {/* 自動取得 or 手動アップロード */}
