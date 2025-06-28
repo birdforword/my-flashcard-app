@@ -1,19 +1,14 @@
-// backend/src/models/cardModel.js
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/database.js';
-import Deck from './deckModel.js';
 
 const Card = sequelize.define('Card', {
-  id:        { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  videoId:   { type: DataTypes.STRING, allowNull: false },
-  timeSec:   { type: DataTypes.FLOAT,  allowNull: true  },
-  frontText: { type: DataTypes.TEXT,   allowNull: false },
-  backText:  { type: DataTypes.TEXT,   allowNull: false },
-  thumbnail: { type: DataTypes.STRING, allowNull: true  },
-  deckId:    { type: DataTypes.INTEGER,
-    references: { model: Deck, key: 'id' },
-    allowNull: false,
-  },
+  id:        { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+  videoId:   DataTypes.STRING,
+  timeSec:   DataTypes.FLOAT,
+  frontText: DataTypes.TEXT,
+  backText:  DataTypes.TEXT,
+  thumbnail: DataTypes.STRING,
+  deckId:    { type: DataTypes.INTEGER, allowNull: false },
 }, {
   tableName: 'cards',
   timestamps: true,

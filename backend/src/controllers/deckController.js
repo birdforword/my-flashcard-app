@@ -3,10 +3,19 @@ import Deck from '../models/deckModel.js';
 import Card from '../models/cardModel.js';
 
 export async function listDecks(req, res) {
-  const decks = await Deck.findAll({
-    include: [{ model: Card, attributes: ['id'] }],
-  });
-  res.json(decks);
+  try {
+    // こうしておくと、Deck に紐づくカード数だけ取れる
+    const decks = await Deck.findAll({
+      include: [{
+        model: Card,
+        attributes: ['id'],   // カードの id だけ取る
+      }],
+    });
+    res.json(decks);
+  } catch (err) {
+    console.error('❌ デッキ一覧取得エラー:', err);
+    res.status(500).json({ error: 'デッキ一覧の取得に失敗しました' });
+  }
 }
 
 export async function createDeck(req, res) {
