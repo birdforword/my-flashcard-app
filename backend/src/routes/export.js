@@ -12,7 +12,9 @@ router.get('/', async (_req, res) => {
     const cards = await Card.findAll();
 
     // Deck を作成（第一引数はファイル名になり、スペースは大丈夫）
-    const apkg = new AnkiExport('Video Flashcards Deck');
+    const apkg = new AnkiExport('Video Flashcards Deck', {
+      fields: ['Start', 'End'],
+    });
 
     // 各カードを追加
     cards.forEach(c => {

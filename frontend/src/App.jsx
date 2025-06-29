@@ -29,7 +29,7 @@ function App() {
   const [selected,  setSelected]  = useState(null);
   const [player,    setPlayer]    = useState(null);
   const [startTime, setStartTime] = useState(null);
-  const [currTime,  setCurrTime]  = useState(0);
+  const [endTime,   setEndTime]   = useState(0);
 
   // ── デッキ一覧取得 ────────────────────────────
   useEffect(() => {
@@ -61,7 +61,7 @@ function App() {
   useEffect(() => {
     if (!player) return;
     const id = setInterval(() => {
-      setCurrTime(player.getCurrentTime());
+      setEndTime(player.getCurrentTime());
     }, 500);
     return () => clearInterval(id);
   }, [player]);
@@ -144,12 +144,30 @@ function App() {
 
       {player && (
         <div className="flex items-center space-x-4">
-          <span className="font-mono text-sm">
-            Start: {startTime !== null ? startTime.toFixed(2) : '--'}s
-          </span>
-          <span className="font-mono text-sm">
-            Now: {currTime.toFixed(2)}s
-          </span>
+          <label className="font-mono text-sm flex items-center space-x-1">
+            <span>Start:</span>
+            <input
+              type="number"
+              step="0.1"
+              className="border px-1 w-20 text-right"
+              value={startTime !== null ? startTime.toFixed(2) : ''}
+              onChange={e =>
+                setStartTime(parseFloat(e.target.value) || 0)
+              }
+            />
+          </label>
+          <label className="font-mono text-sm flex items-center space-x-1">
+            <span>End:</span>
+            <input
+              type="number"
+              step="0.1"
+              className="border px-1 w-20 text-right"
+              value={endTime.toFixed(2)}
+              onChange={e =>
+                setEndTime(parseFloat(e.target.value) || 0)
+              }
+            />
+          </label>
           {currentDeck && (
             <button
               className="bg-green-500 text-white px-3 py-1 rounded"
@@ -159,8 +177,8 @@ function App() {
                   deckId: currentDeck,
                   videoId,
                   timeSec: startTime,
-                  frontText: `{{Start}}${startTime.toFixed(2)}`,
-                  backText: `{{End}}${currTime.toFixed(2)}`,
+                  frontText: startTime.toFixed(2),
+                  backText: endTime.toFixed(2),
                   thumbnail: null,
                 });
                 fetchCards(currentDeck).then(setCards);
