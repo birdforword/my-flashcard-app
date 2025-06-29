@@ -66,14 +66,14 @@ function App() {
     return () => clearInterval(id);
   }, [player]);
 
-  const handleStateChange = (state) => {
+  const handlePlayerStateChange = (state) => {
     if (state === 1 && player) {
       setStartTime(player.getCurrentTime());
     }
   };
 
   // ── イベントハンドラ ───────────────────────────
-  const onSearch = () => {
+  const handleSearch = () => {
     let id;
     try {
       const url = new URL(inputText);
@@ -126,7 +126,7 @@ function App() {
         />
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={onSearch}
+          onClick={handleSearch}
         >
           表示
         </button>
@@ -138,7 +138,7 @@ function App() {
           key={videoId}
           videoId={videoId}
           onReady={setPlayer}
-          onStateChange={handleStateChange}
+          onStateChange={handlePlayerStateChange}
         />
       )}
 
