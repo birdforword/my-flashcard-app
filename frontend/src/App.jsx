@@ -165,23 +165,42 @@ function App() {
             />
           </label>
           {currentDeck && (
-            <button
-              className="bg-green-500 text-white px-3 py-1 rounded"
-              onClick={async () => {
-                if (startTime === null) return;
-                await createCard({
-                  deckId: currentDeck,
-                  videoId,
-                  timeSec: startTime,
-                  frontText: startTime.toFixed(2),
-                  backText: endTime.toFixed(2),
-                  thumbnail: null,
-                });
-                fetchCards(currentDeck).then(setCards);
-              }}
-            >
-              作成
-            </button>
+            <>
+              <button
+                className="bg-green-500 text-white px-3 py-1 rounded"
+                onClick={async () => {
+                  if (startTime === null) return;
+                  await createCard({
+                    deckId: currentDeck,
+                    videoId,
+                    timeSec: startTime,
+                    frontText: startTime.toFixed(2),
+                    backText: endTime.toFixed(2),
+                    thumbnail: null,
+                  });
+                  fetchCards(currentDeck).then(setCards);
+                }}
+              >
+                作成
+              </button>
+              <button
+                className="bg-indigo-500 text-white px-3 py-1 rounded"
+                onClick={async () => {
+                  if (startTime === null) return;
+                  await createCard({
+                    deckId: currentDeck,
+                    videoId,
+                    timeSec: startTime,
+                    frontText: startTime.toFixed(2),
+                    backText: endTime.toFixed(2),
+                    thumbnail: null,
+                  });
+                  fetchCards(currentDeck).then(setCards);
+                }}
+              >
+                Ankiカード生成
+              </button>
+            </>
           )}
         </div>
       )}
