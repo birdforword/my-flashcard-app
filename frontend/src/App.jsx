@@ -59,7 +59,16 @@ function App() {
       .then(setCaptions)
       .catch(() => setCaptions([]));
     fetchVideoTitle(videoId)
-      .then(setVideoTitle)
+      .then(async (title) => {
+        setVideoTitle(title);
+        try {
+          const deck = await createDeck(title);
+          setCurrentDeck(deck.id);
+          fetchDecks().then(setDecks);
+        } catch {
+          // デッキ作成に失敗した場合でもタイトルは保持する
+        }
+      })
       .catch(() => setVideoTitle(""));
   }, [videoId]);
 
@@ -98,15 +107,20 @@ function App() {
   }, []);
 
   const quickCreateCard = async () => {
-    if (startTime === null || !currentDeck) return;
+    if (!player || !currentDeck) return;
+    const now = player.getCurrentTime();
+    const start = startTime !== null ? startTime : now;
+    const end = now;
     await createCard({
       deckId: currentDeck,
       videoId,
-      timeSec: startTime,
-      frontText: startTime.toFixed(2),
-      backText: endTime.toFixed(2),
+      timeSec: start,
+      frontText: start.toFixed(2),
+      backText: end.toFixed(2),
       thumbnail: null,
     });
+    setStartTime(start);
+    setEndTime(end);
     fetchCards(currentDeck).then(setCards);
   };
 
@@ -131,22 +145,16 @@ function App() {
       {/* サーバステータス */}
       <p className="text-sm text-gray-600">サーバー: {status}</p>
 
-      {/* デッキ一覧 & 作成 */}
+      {/* デッキ一覧 */}
       <DeckList
         decks={decks}
         onSelect={(id) => setCurrentDeck(id)}
-        onCreate={async (name) => {
-          const deckName = name || videoTitle || "New Deck";
-          await createDeck(deckName);
-          fetchDecks().then(setDecks);
-        }}
         onDelete={async (id) => {
           await deleteDeck(id);
           if (currentDeck === id) setCurrentDeck(null);
           fetchDecks().then(setDecks);
         }}
         onExport={handleExportDeck}
-        defaultName={videoTitle}
       />
 
       {/* 選択中のデッキ名 */}
@@ -186,23 +194,15 @@ function App() {
         <div className="flex items-center space-x-4">
           <label className="font-mono text-sm flex items-center space-x-1">
             <span>Start:</span>
-            <input
-              type="number"
-              step="0.1"
-              className="border px-1 w-20 text-right"
-              value={startTime !== null ? startTime.toFixed(2) : ""}
-              onChange={(e) => setStartTime(parseFloat(e.target.value) || 0)}
-            />
+            <span className="inline-block w-20 text-right">
+              {startTime !== null ? startTime.toFixed(2) : ""}
+            </span>
           </label>
           <label className="font-mono text-sm flex items-center space-x-1">
             <span>End:</span>
-            <input
-              type="number"
-              step="0.1"
-              className="border px-1 w-20 text-right"
-              value={endTime.toFixed(2)}
-              onChange={(e) => setEndTime(parseFloat(e.target.value) || 0)}
-            />
+            <span className="inline-block w-20 text-right">
+              {endTime.toFixed(2)}
+            </span>
           </label>
           <button
             className="bg-green-500 text-white px-3 py-1 rounded disabled:opacity-50"

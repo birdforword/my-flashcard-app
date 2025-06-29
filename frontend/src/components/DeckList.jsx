@@ -1,22 +1,8 @@
 // frontend/src/components/DeckList.jsx
-import { useState, useEffect } from "react";
+// デッキの一覧を表示するだけのシンプルなコンポーネント
+import React from "react";
 
-export default function DeckList({
-  decks,
-  onSelect,
-  onCreate,
-  onDelete,
-  onExport,
-  defaultName,
-}) {
-  const [name, setName] = useState("");
-
-  // デフォルト名が更新されたら入力も更新する
-  useEffect(() => {
-    if (defaultName) {
-      setName(defaultName);
-    }
-  }, [defaultName]);
+export default function DeckList({ decks, onSelect, onDelete, onExport }) {
   return (
     <div className="mb-4">
       <h2 className="text-lg font-bold mb-2">デッキ一覧</h2>
@@ -43,23 +29,6 @@ export default function DeckList({
           </li>
         ))}
       </ul>
-      <div className="flex space-x-2">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="新しいデッキ名"
-          className="border p-1 flex-1"
-        />
-        <button
-          className="bg-green-500 text-white px-3"
-          onClick={() => {
-            onCreate(name);
-            setName("");
-          }}
-        >
-          作成
-        </button>
-      </div>
     </div>
   );
 }
