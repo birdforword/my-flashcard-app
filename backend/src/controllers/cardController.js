@@ -7,8 +7,9 @@ import * as cardService from "../services/cardService.js";
  */
 export async function createCard(req, res) {
   try {
-    const { videoId, timeSec, frontText, backText, thumbnail } = req.body;
+    const { deckId, videoId, timeSec, frontText, backText, thumbnail } = req.body;
     const card = await cardService.addCard({
+      deckId,
       videoId,
       timeSec,
       frontText,
@@ -28,7 +29,8 @@ export async function createCard(req, res) {
  */
 export async function listCards(req, res) {
   try {
-    const cards = await cardService.getAllCards();
+    const where = req.query.deckId ? { deckId: req.query.deckId } : {};
+    const cards = await cardService.getAllCards(where);
     return res.status(200).json(cards);
   } catch (error) {
     console.error("List cards error:", error);

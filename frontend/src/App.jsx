@@ -1,4 +1,3 @@
-// frontend/src/App.jsx
 import { useEffect, useState } from "react";
 import {
   fetchHealth,
@@ -66,14 +65,14 @@ function App() {
     return () => clearInterval(id);
   }, [player]);
 
-  const handleStateChange = (state) => {
+  const handlePlayerStateChange = (state) => {
     if (state === 1 && player) {
       setStartTime(player.getCurrentTime());
     }
   };
 
   // ── イベントハンドラ ───────────────────────────
-  const onSearch = () => {
+  const handleSearch = () => {
     let id;
     try {
       const url = new URL(inputText);
@@ -87,6 +86,19 @@ function App() {
   };
 
   const handleUpload = (parsed) => setCaptions(parsed);
+
+  const handleQuickCreate = async () => {
+    if (startTime === null || !currentDeck) return;
+    await createCard({
+      deckId: currentDeck,
+      videoId,
+      timeSec: startTime,
+      frontText: startTime.toFixed(2),
+      backText: endTime.toFixed(2),
+      thumbnail: null,
+    });
+    fetchCards(currentDeck).then(setCards);
+  };
 
   // ── JSX ───────────────────────────────────────
   return (
@@ -116,32 +128,7 @@ function App() {
         </h2>
       )}
 
-      {/* YouTube URL/ID 検索フォーム */}
-      <div className="flex items-center space-x-2">
-        <input
-          className="border p-2 flex-1"
-          placeholder="YouTube URL または動画ID"
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-        />
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={onSearch}
-        >
-          表示
-        </button>
-      </div>
-
-      {/* 動画プレイヤー */}
-      {videoId && (
-        <Player
-          key={videoId}
-          videoId={videoId}
-          onReady={setPlayer}
-          onStateChange={handleStateChange}
-        />
-      )}
-
+      {/* プレイヤー制御 */}
       {player && (
         <div className="flex items-center space-x-4">
           <label className="font-mono text-sm flex items-center space-x-1">
@@ -164,44 +151,20 @@ function App() {
               onChange={(e) => setEndTime(parseFloat(e.target.value) || 0)}
             />
           </label>
-          {currentDeck && (
-            <>
-              <button
-                className="bg-green-500 text-white px-3 py-1 rounded"
-                onClick={async () => {
-                  if (startTime === null) return;
-                  await createCard({
-                    deckId: currentDeck,
-                    videoId,
-                    timeSec: startTime,
-                    frontText: startTime.toFixed(2),
-                    backText: endTime.toFixed(2),
-                    thumbnail: null,
-                  });
-                  fetchCards(currentDeck).then(setCards);
-                }}
-              >
-                作成
-              </button>
-              <button
-                className="bg-indigo-500 text-white px-3 py-1 rounded"
-                onClick={async () => {
-                  if (startTime === null) return;
-                  await createCard({
-                    deckId: currentDeck,
-                    videoId,
-                    timeSec: startTime,
-                    frontText: startTime.toFixed(2),
-                    backText: endTime.toFixed(2),
-                    thumbnail: null,
-                  });
-                  fetchCards(currentDeck).then(setCards);
-                }}
-              >
-                Ankiカード生成
-              </button>
-            </>
-          )}
+          <button
+            className="bg-green-500 text-white px-3 py-1 rounded disabled:opacity-50"
+            disabled={!currentDeck}
+            onClick={handleQuickCreate}
+          >
+            作成
+          </button>
+          <button
+            className="bg-indigo-500 text-white px-3 py-1 rounded disabled:opacity-50"
+            disabled={!currentDeck}
+            onClick={handleQuickCreate}
+          >
+            Ankiカード生成
+          </button>
         </div>
       )}
 
@@ -229,9 +192,7 @@ function App() {
           videoId={videoId}
           initialFront={selected?.text || ""}
           initialTimeSec={selected?.offset || null}
-          onCreated={() => {
-            fetchCards(currentDeck).then(setCards);
-          }}
+          onCreated={() => fetchCards(currentDeck).then(setCards)}
         />
       )}
 
