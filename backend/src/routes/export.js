@@ -4,15 +4,26 @@ import AnkiExportPkg from "anki-apkg-export";
 const AnkiExport = AnkiExportPkg.default; // CommonJS の default export を受け取る
 
 import Card from "../models/cardModel.js";
+import Deck from "../models/deckModel.js";
 
 const router = express.Router();
 
-router.get("/", async (_req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const cards = await Card.findAll();
+    const deckId = req.query.deckId ? parseInt(req.query.deckId, 10) : null;
+    const where = deckId ? { deckId } : {};
+    const cards = await Card.findAll({ where });
+    let deckName = "Video Flashcards Deck";
+    if (deckId) {
+      const deck = await Deck.findByPk(deckId);
+      if (!deck) {
+        return res.status(404).json({ error: "Deck not found" });
+      }
+      deckName = deck.name;
+    }
 
     // Deck を作成（第一引数はファイル名になり、スペースは大丈夫）
-    const apkg = new AnkiExport("Video Flashcards Deck", {
+    const apkg = new AnkiExport(deckName, {
       fields: ["Start", "End"],
     });
 
@@ -31,7 +42,7 @@ router.get("/", async (_req, res) => {
 
     res.setHeader(
       "Content-Disposition",
-      'attachment; filename="video_deck.apkg"',
+      `attachment; filename="${encodeURIComponent(deckName)}.apkg"`,
     );
     res.setHeader("Content-Type", "application/octet-stream");
     res.send(buffer);

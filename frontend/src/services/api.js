@@ -18,6 +18,9 @@ export const exportDeck = (deckId) =>
 export const fetchCaptions = (videoId, lang = "en") =>
   api.get(`/captions/${videoId}?lang=${lang}`).then((r) => r.data);
 
+export const fetchVideoTitle = (videoId) =>
+  api.get(`/videos/${videoId}/title`).then((r) => r.data.title);
+
 // Deck management
 export const fetchDecks = () => api.get("/decks").then((r) => r.data);
 export const createDeck = (name) =>

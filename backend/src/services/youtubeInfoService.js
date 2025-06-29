@@ -19,3 +19,17 @@ export async function fetchVideoDescription(videoId) {
   if (!items.length) throw new Error("Video not found");
   return items[0].snippet.description;
 }
+
+export async function fetchVideoTitle(videoId) {
+  const url = "https://www.googleapis.com/youtube/v3/videos";
+  const res = await axios.get(url, {
+    params: {
+      part: "snippet",
+      id: videoId,
+      key: KEY,
+    },
+  });
+  const items = res.data.items || [];
+  if (!items.length) throw new Error("Video not found");
+  return items[0].snippet.title;
+}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   fetchHealth,
   fetchCards,
@@ -7,6 +7,8 @@ import {
   createDeck,
   deleteDeck,
   createCard,
+  exportDeck,
+  fetchVideoTitle,
 } from "./services/api";
 import Player from "./components/Player";
 import SubtitleOverlay from "./components/SubtitleOverlay";
@@ -24,6 +26,7 @@ function App() {
 
   const [inputText, setInputText] = useState("");
   const [videoId, setVideoId] = useState("");
+  const [videoTitle, setVideoTitle] = useState("");
   const [captions, setCaptions] = useState([]);
   const [selected, setSelected] = useState(null);
   const [player, setPlayer] = useState(null);
@@ -49,11 +52,15 @@ function App() {
   useEffect(() => {
     if (!videoId) {
       setCaptions([]);
+      setVideoTitle("");
       return;
     }
     fetchCaptions(videoId, "en")
       .then(setCaptions)
       .catch(() => setCaptions([]));
+    fetchVideoTitle(videoId)
+      .then(setVideoTitle)
+      .catch(() => setVideoTitle(""));
   }, [videoId]);
 
   // ── プレイヤーの現在時刻更新 ─────────────────────
@@ -65,6 +72,7 @@ function App() {
     return () => clearInterval(id);
   }, [player]);
 
+  // プレイヤーの状態変化時の処理
   const handlePlayerStateChange = (state) => {
     if (state === 1 && player) {
       setStartTime(player.getCurrentTime());
@@ -85,9 +93,11 @@ function App() {
     setVideoId(id);
   };
 
-  const handleUpload = (parsed) => setCaptions(parsed);
+  const handleUpload = useCallback((parsed) => {
+    setCaptions(parsed);
+  }, []);
 
-  const handleQuickCreate = async () => {
+  const quickCreateCard = async () => {
     if (startTime === null || !currentDeck) return;
     await createCard({
       deckId: currentDeck,
@@ -98,6 +108,21 @@ function App() {
       thumbnail: null,
     });
     fetchCards(currentDeck).then(setCards);
+  };
+
+  const handleExportDeck = async (deck) => {
+    try {
+      const blob = await exportDeck(deck.id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${deck.name}.apkg`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("エクスポート中にエラーが発生しました");
+      console.error(err);
+    }
   };
 
   // ── JSX ───────────────────────────────────────
@@ -111,7 +136,8 @@ function App() {
         decks={decks}
         onSelect={(id) => setCurrentDeck(id)}
         onCreate={async (name) => {
-          await createDeck(name);
+          const deckName = name || videoTitle || "New Deck";
+          await createDeck(deckName);
           fetchDecks().then(setDecks);
         }}
         onDelete={async (id) => {
@@ -119,6 +145,8 @@ function App() {
           if (currentDeck === id) setCurrentDeck(null);
           fetchDecks().then(setDecks);
         }}
+        onExport={handleExportDeck}
+        defaultName={videoTitle}
       />
 
       {/* 選択中のデッキ名 */}
@@ -128,7 +156,32 @@ function App() {
         </h2>
       )}
 
-      {/* プレイヤー制御 */}
+      {/* YouTube URL/ID 検索フォーム */}
+      <div className="flex items-center space-x-2">
+        <input
+          className="border p-2 flex-1"
+          placeholder="YouTube URL または動画ID"
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+        />
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+          onClick={handleSearch}
+        >
+          表示
+        </button>
+      </div>
+
+      {/* 動画プレイヤー */}
+      {videoId && (
+        <Player
+          key={videoId}
+          videoId={videoId}
+          onReady={setPlayer}
+          onStateChange={handlePlayerStateChange}
+        />
+      )}
+
       {player && (
         <div className="flex items-center space-x-4">
           <label className="font-mono text-sm flex items-center space-x-1">
@@ -154,16 +207,9 @@ function App() {
           <button
             className="bg-green-500 text-white px-3 py-1 rounded disabled:opacity-50"
             disabled={!currentDeck}
-            onClick={handleQuickCreate}
+            onClick={quickCreateCard}
           >
             作成
-          </button>
-          <button
-            className="bg-indigo-500 text-white px-3 py-1 rounded disabled:opacity-50"
-            disabled={!currentDeck}
-            onClick={handleQuickCreate}
-          >
-            Ankiカード生成
           </button>
         </div>
       )}
@@ -207,7 +253,10 @@ function App() {
               </li>
             ))}
           </ul>
-          <ExportButton deckId={currentDeck} />
+          <ExportButton
+            deckId={currentDeck}
+            deckName={decks.find((d) => d.id === currentDeck)?.name || "deck"}
+          />
         </>
       )}
     </div>
