@@ -1,14 +1,7 @@
 // frontend/src/components/Player.jsx
 import YouTube from "react-youtube";
 
-export default function Player({
-  videoId,
-  onReady,
-  onStateChange,
-  startTime,
-  endTime,
-  onCreateCard,
-}) {
+export default function Player({ videoId, onReady, onStateChange }) {
   const opts = {
     height: "360",
     width: "640",
@@ -21,7 +14,7 @@ export default function Player({
   };
 
   return (
-    <div className="relative my-4 inline-block">
+    <div className="my-4">
       <YouTube
         videoId={videoId}
         opts={opts}
@@ -34,20 +27,6 @@ export default function Player({
           onStateChange && onStateChange(event.data);
         }}
       />
-      {onCreateCard && (
-        <div className="absolute bottom-2 left-24 flex items-center space-x-2 bg-white bg-opacity-80 px-2 py-1 rounded text-xs">
-          <span className="font-mono">
-            {startTime !== null ? startTime.toFixed(2) : ""}
-          </span>
-          <span className="font-mono">{endTime.toFixed(2)}</span>
-          <button
-            className="bg-green-500 text-white px-2 py-0.5 rounded"
-            onClick={onCreateCard}
-          >
-            作成
-          </button>
-        </div>
-      )}
     </div>
   );
 }

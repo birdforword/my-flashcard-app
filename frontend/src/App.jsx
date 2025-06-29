@@ -139,24 +139,6 @@ function App() {
           videoId={videoId}
           onReady={setPlayer}
           onStateChange={handleStateChange}
-          startTime={startTime}
-          endTime={endTime}
-          onCreateCard={
-            currentDeck
-              ? async () => {
-                  if (startTime === null) return;
-                  await createCard({
-                    deckId: currentDeck,
-                    videoId,
-                    timeSec: startTime,
-                    frontText: startTime.toFixed(2),
-                    backText: endTime.toFixed(2),
-                    thumbnail: null,
-                  });
-                  fetchCards(currentDeck).then(setCards);
-                }
-              : null
-          }
         />
       )}
 
@@ -182,7 +164,25 @@ function App() {
               onChange={(e) => setEndTime(parseFloat(e.target.value) || 0)}
             />
           </label>
-          {/* カード作成ボタンはプレイヤー内に移動 */}
+          {currentDeck && (
+            <button
+              className="bg-green-500 text-white px-3 py-1 rounded"
+              onClick={async () => {
+                if (startTime === null) return;
+                await createCard({
+                  deckId: currentDeck,
+                  videoId,
+                  timeSec: startTime,
+                  frontText: startTime.toFixed(2),
+                  backText: endTime.toFixed(2),
+                  thumbnail: null,
+                });
+                fetchCards(currentDeck).then(setCards);
+              }}
+            >
+              作成
+            </button>
+          )}
         </div>
       )}
 
