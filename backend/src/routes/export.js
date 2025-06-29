@@ -12,7 +12,9 @@ router.get('/', async (_req, res) => {
     const cards = await Card.findAll();
 
     // Deck を作成（第一引数はファイル名になり、スペースは大丈夫）
-    const apkg = new AnkiExport('Video Flashcards Deck');
+    const apkg = new AnkiExport('Video Flashcards Deck', {
+      fields: ['Start', 'End'],
+    });
 
     // 各カードを追加
     cards.forEach(c => {
@@ -25,7 +27,7 @@ router.get('/', async (_req, res) => {
     });
 
     // .save() が Buffer を返すので、そのまま送信
-    const buffer = await apkg.save();  // :contentReference[oaicite:0]{index=0}
+    const buffer = await apkg.save();
 
     res.setHeader('Content-Disposition', 'attachment; filename="video_deck.apkg"');
     res.setHeader('Content-Type', 'application/octet-stream');

@@ -5,7 +5,8 @@ import { fetchCaptions } from '../services/youtubeService.js';
 const router = express.Router();
 
 router.get('/:videoId', async (req, res) => {
-  const caps = await fetchCaptions(req.params.videoId);
+  const lang = req.query.lang || 'en';
+  const caps = await fetchCaptions(req.params.videoId, lang);
   res.json(caps);
 });
 

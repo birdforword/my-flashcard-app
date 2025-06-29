@@ -29,3 +29,28 @@ export async function listCards(req, res) {
     return res.status(500).json({ error: 'Failed to retrieve cards' });
   }
 }
+
+export async function deleteCard(req, res) {
+  try {
+    await cardService.deleteCard(req.params.id);
+    return res.status(204).end();
+  } catch (error) {
+    console.error('Delete card error:', error);
+    return res.status(500).json({ error: 'Failed to delete card' });
+  }
+}
+
+export async function deleteCardsByDeck(req, res) {
+  try {
+    const { deckId } = req.query;
+    if (!deckId) {
+      return res.status(400).json({ error: 'deckId is required' });
+    }
+    await cardService.deleteCardsByDeck(deckId);
+    return res.status(204).end();
+  } catch (error) {
+    console.error('Delete cards by deck error:', error);
+    return res.status(500).json({ error: 'Failed to delete cards' });
+  }
+}
+

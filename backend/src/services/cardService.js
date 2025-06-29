@@ -18,3 +18,29 @@ export async function addCard(data) {
 export async function getAllCards() {
   return await Card.findAll();
 }
+
+/**
+ * 指定デッキのカードを取得
+ * @param {number|string} deckId
+ * @returns {Promise<Card[]>}
+ */
+export async function getCardsByDeck(deckId) {
+  return await Card.findAll({ where: { deckId } });
+}
+
+/**
+ * 単一カードを削除
+ * @param {number|string} id
+ */
+export async function deleteCard(id) {
+  await Card.destroy({ where: { id } });
+}
+
+/**
+ * デッキ内のカードを一括削除
+ * @param {number|string} deckId
+ */
+export async function deleteCardsByDeck(deckId) {
+  await Card.destroy({ where: { deckId } });
+}
+

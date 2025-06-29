@@ -4,11 +4,11 @@ import Card from '../models/cardModel.js';
 
 export async function listDecks(req, res) {
   try {
-    // こうしておくと、Deck に紐づくカード数だけ取れる
     const decks = await Deck.findAll({
       include: [{
         model: Card,
-        attributes: ['id'],   // カードの id だけ取る
+        separate: true,
+        order: [['timeSec', 'ASC']],
       }],
     });
     res.json(decks);
