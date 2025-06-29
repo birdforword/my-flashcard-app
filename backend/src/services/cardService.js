@@ -1,6 +1,6 @@
 // backend/src/services/cardService.js
 
-import Card from '../models/cardModel.js';  // ← モデルをインポート
+import Card from "../models/cardModel.js"; // ← モデルをインポート
 
 /**
  * 新しいカードを追加

@@ -1,17 +1,17 @@
 // backend/src/config/database.js
-import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
+import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
 
 dotenv.config();
 
 const { DATABASE_URL } = process.env;
 if (!DATABASE_URL) {
-  throw new Error('Environment variable DATABASE_URL must be set');
+  throw new Error("Environment variable DATABASE_URL must be set");
 }
 
 const sequelize = new Sequelize(DATABASE_URL, {
-  dialect: 'postgres',
-  protocol: 'postgres',
+  dialect: "postgres",
+  protocol: "postgres",
   logging: false,
   pool: {
     max: 10,
@@ -24,9 +24,9 @@ const sequelize = new Sequelize(DATABASE_URL, {
 async function testConnection() {
   try {
     await sequelize.authenticate();
-    console.log('✅ Database connection established');
+    console.log("✅ Database connection established");
   } catch (error) {
-    console.error('❌ Database connection failed:', error);
+    console.error("❌ Database connection failed:", error);
     process.exit(1);
   }
 }

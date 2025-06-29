@@ -1,21 +1,21 @@
 // frontend/src/components/SubtitleOverlay.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function SubtitleOverlay({ player, captions }) {
-  const [currentText, setCurrentText] = useState('');
+  const [currentText, setCurrentText] = useState("");
 
   useEffect(() => {
     if (!player || !captions.length) {
-      setCurrentText('');
+      setCurrentText("");
       return;
     }
 
     const interval = setInterval(() => {
       const t = player.getCurrentTime();
-      const cap = captions.find(c =>
-        t >= c.offset && t < c.offset + c.duration
+      const cap = captions.find(
+        (c) => t >= c.offset && t < c.offset + c.duration,
       );
-      setCurrentText(cap ? cap.text : '');
+      setCurrentText(cap ? cap.text : "");
     }, 500);
 
     return () => clearInterval(interval);

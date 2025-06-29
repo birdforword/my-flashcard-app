@@ -1,5 +1,5 @@
 // frontend/src/App.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import {
   fetchHealth,
   fetchCards,
@@ -7,29 +7,29 @@ import {
   fetchDecks,
   createDeck,
   deleteDeck,
-  createCard
-} from './services/api';
-import Player          from './components/Player';
-import SubtitleOverlay from './components/SubtitleOverlay';
-import UploadSubtitles from './components/UploadSubtitles';
-import CaptionsList    from './components/CaptionsList';
-import DeckList        from './components/DeckList';
-import CardForm        from './components/CardForm';
-import ExportButton    from './components/ExportButton';
+  createCard,
+} from "./services/api";
+import Player from "./components/Player";
+import SubtitleOverlay from "./components/SubtitleOverlay";
+import UploadSubtitles from "./components/UploadSubtitles";
+import CaptionsList from "./components/CaptionsList";
+import DeckList from "./components/DeckList";
+import CardForm from "./components/CardForm";
+import ExportButton from "./components/ExportButton";
 
 function App() {
-  const [status,      setStatus]      = useState('');
-  const [cards,       setCards]       = useState([]);
-  const [decks,       setDecks]       = useState([]);
+  const [status, setStatus] = useState("");
+  const [cards, setCards] = useState([]);
+  const [decks, setDecks] = useState([]);
   const [currentDeck, setCurrentDeck] = useState(null);
 
-  const [inputText, setInputText] = useState('');
-  const [videoId,   setVideoId]   = useState('');
-  const [captions,  setCaptions]  = useState([]);
-  const [selected,  setSelected]  = useState(null);
-  const [player,    setPlayer]    = useState(null);
+  const [inputText, setInputText] = useState("");
+  const [videoId, setVideoId] = useState("");
+  const [captions, setCaptions] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [player, setPlayer] = useState(null);
   const [startTime, setStartTime] = useState(null);
-  const [endTime,   setEndTime]   = useState(0);
+  const [endTime, setEndTime] = useState(0);
 
   // ── デッキ一覧取得 ────────────────────────────
   useEffect(() => {
@@ -52,7 +52,7 @@ function App() {
       setCaptions([]);
       return;
     }
-    fetchCaptions(videoId, 'en')
+    fetchCaptions(videoId, "en")
       .then(setCaptions)
       .catch(() => setCaptions([]));
   }, [videoId]);
@@ -66,7 +66,7 @@ function App() {
     return () => clearInterval(id);
   }, [player]);
 
-  const handleStateChange = state => {
+  const handleStateChange = (state) => {
     if (state === 1 && player) {
       setStartTime(player.getCurrentTime());
     }
@@ -77,16 +77,16 @@ function App() {
     let id;
     try {
       const url = new URL(inputText);
-      id = url.hostname.includes('youtu.be')
+      id = url.hostname.includes("youtu.be")
         ? url.pathname.slice(1)
-        : url.searchParams.get('v') || '';
+        : url.searchParams.get("v") || "";
     } catch {
       id = inputText.trim();
     }
     setVideoId(id);
   };
 
-  const handleUpload = parsed => setCaptions(parsed);
+  const handleUpload = (parsed) => setCaptions(parsed);
 
   // ── JSX ───────────────────────────────────────
   return (
@@ -97,12 +97,12 @@ function App() {
       {/* デッキ一覧 & 作成 */}
       <DeckList
         decks={decks}
-        onSelect={id => setCurrentDeck(id)}
-        onCreate={async name => {
+        onSelect={(id) => setCurrentDeck(id)}
+        onCreate={async (name) => {
           await createDeck(name);
           fetchDecks().then(setDecks);
         }}
-        onDelete={async id => {
+        onDelete={async (id) => {
           await deleteDeck(id);
           if (currentDeck === id) setCurrentDeck(null);
           fetchDecks().then(setDecks);
@@ -112,7 +112,7 @@ function App() {
       {/* 選択中のデッキ名 */}
       {currentDeck && (
         <h2 className="text-xl font-semibold">
-          デッキ: {decks.find(d => d.id === currentDeck)?.name}
+          デッキ: {decks.find((d) => d.id === currentDeck)?.name}
         </h2>
       )}
 
@@ -122,7 +122,7 @@ function App() {
           className="border p-2 flex-1"
           placeholder="YouTube URL または動画ID"
           value={inputText}
-          onChange={e => setInputText(e.target.value)}
+          onChange={(e) => setInputText(e.target.value)}
         />
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -150,10 +150,8 @@ function App() {
               type="number"
               step="0.1"
               className="border px-1 w-20 text-right"
-              value={startTime !== null ? startTime.toFixed(2) : ''}
-              onChange={e =>
-                setStartTime(parseFloat(e.target.value) || 0)
-              }
+              value={startTime !== null ? startTime.toFixed(2) : ""}
+              onChange={(e) => setStartTime(parseFloat(e.target.value) || 0)}
             />
           </label>
           <label className="font-mono text-sm flex items-center space-x-1">
@@ -163,9 +161,7 @@ function App() {
               step="0.1"
               className="border px-1 w-20 text-right"
               value={endTime.toFixed(2)}
-              onChange={e =>
-                setEndTime(parseFloat(e.target.value) || 0)
-              }
+              onChange={(e) => setEndTime(parseFloat(e.target.value) || 0)}
             />
           </label>
           {currentDeck && (
@@ -199,7 +195,7 @@ function App() {
           <SubtitleOverlay player={player} captions={captions} />
           <CaptionsList
             captions={captions}
-            onSelect={c => {
+            onSelect={(c) => {
               setSelected(c);
               player?.seekTo(c.offset, true);
             }}
@@ -212,7 +208,7 @@ function App() {
         <CardForm
           deckId={currentDeck}
           videoId={videoId}
-          initialFront={selected?.text || ''}
+          initialFront={selected?.text || ""}
           initialTimeSec={selected?.offset || null}
           onCreated={() => {
             fetchCards(currentDeck).then(setCards);
@@ -225,7 +221,7 @@ function App() {
         <>
           <h2 className="text-xl">Cards</h2>
           <ul className="list-disc pl-5 space-y-1">
-            {cards.map(c => (
+            {cards.map((c) => (
               <li key={c.id}>
                 [{c.id}] {c.frontText} → {c.backText}
               </li>

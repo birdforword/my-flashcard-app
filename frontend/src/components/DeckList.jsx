@@ -1,18 +1,13 @@
 // frontend/src/components/DeckList.jsx
-import { useState } from 'react';
+import { useState } from "react";
 
-export default function DeckList({
-  decks,
-  onSelect,
-  onCreate,
-  onDelete
-}) {
-  const [name, setName] = useState('');
+export default function DeckList({ decks, onSelect, onCreate, onDelete }) {
+  const [name, setName] = useState("");
   return (
     <div className="mb-4">
       <h2 className="text-lg font-bold mb-2">デッキ一覧</h2>
       <ul className="list-disc pl-5 mb-2">
-        {decks.map(deck => (
+        {decks.map((deck) => (
           <li key={deck.id} className="flex justify-between">
             <span
               className="cursor-pointer text-blue-600 hover:underline"
@@ -20,10 +15,7 @@ export default function DeckList({
             >
               {deck.name} ({deck.Cards.length})
             </span>
-            <button
-              className="text-red-500"
-              onClick={() => onDelete(deck.id)}
-            >
+            <button className="text-red-500" onClick={() => onDelete(deck.id)}>
               削除
             </button>
           </li>
@@ -32,13 +24,16 @@ export default function DeckList({
       <div className="flex space-x-2">
         <input
           value={name}
-          onChange={e => setName(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           placeholder="新しいデッキ名"
           className="border p-1 flex-1"
         />
         <button
           className="bg-green-500 text-white px-3"
-          onClick={() => { onCreate(name); setName(''); }}
+          onClick={() => {
+            onCreate(name);
+            setName("");
+          }}
         >
           作成
         </button>
