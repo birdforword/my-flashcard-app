@@ -6,8 +6,6 @@ import {
   fetchDecks,
   createDeck,
   deleteDeck,
-  createCard,
-  deleteCard,
   exportDeck,
   fetchVideoTitle,
 } from "./services/api";
@@ -31,8 +29,6 @@ function App() {
   const [captions, setCaptions] = useState([]);
   const [selected, setSelected] = useState(null);
   const [player, setPlayer] = useState(null);
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(0);
 
   // ── デッキ一覧取得 ────────────────────────────
   useEffect(() => {
@@ -81,21 +77,7 @@ function App() {
       .catch(() => setVideoTitle(""));
   }, [videoId]);
 
-  // ── プレイヤーの現在時刻更新 ─────────────────────
-  useEffect(() => {
-    if (!player) return;
-    const id = setInterval(() => {
-      setEndTime(player.getCurrentTime());
-    }, 500);
-    return () => clearInterval(id);
-  }, [player]);
 
-  // プレイヤーの状態変化時の処理
-  const handlePlayerStateChange = (state) => {
-    if (state === 1 && player) {
-      setStartTime(player.getCurrentTime());
-    }
-  };
 
   // ── イベントハンドラ ───────────────────────────
   const handleSearch = () => {
@@ -115,25 +97,6 @@ function App() {
     setCaptions(parsed);
   }, []);
 
-  const quickCreateCard = async () => {
-    if (!player || !currentDeck) return;
-    const now = player.getCurrentTime();
-    const start = startTime !== null ? startTime : now;
-    const end = now;
-    await createCard({
-      deckId: currentDeck,
-      videoId,
-      timeSec: start,
-      frontText: start.toFixed(2),
-      backText: end.toFixed(2),
-      thumbnail: null,
-    });
-    setStartTime(start);
-    setEndTime(end);
-    fetchCards(currentDeck).then((cs) =>
-      setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec))
-    );
-  };
 
   const handleExportDeck = async (deck) => {
     try {
@@ -199,33 +162,10 @@ function App() {
           key={videoId}
           videoId={videoId}
           onReady={setPlayer}
-          onStateChange={handlePlayerStateChange}
         />
       )}
 
-      {player && (
-        <div className="flex items-center space-x-4">
-          <label className="font-mono text-sm flex items-center space-x-1">
-            <span>Start:</span>
-            <span className="inline-block w-20 text-right">
-              {startTime !== null ? startTime.toFixed(2) : ""}
-            </span>
-          </label>
-          <label className="font-mono text-sm flex items-center space-x-1">
-            <span>End:</span>
-            <span className="inline-block w-20 text-right">
-              {endTime.toFixed(2)}
-            </span>
-          </label>
-          <button
-            className="bg-green-500 text-white px-3 py-1 rounded disabled:opacity-50"
-            disabled={!currentDeck}
-            onClick={quickCreateCard}
-          >
-            作成
-          </button>
-        </div>
-      )}
+
 
       {/* 自動取得 or 手動アップロード */}
       {videoId && captions.length === 0 && (
