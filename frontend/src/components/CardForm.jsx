@@ -56,18 +56,10 @@ export default function CardForm({
 
   return (
     <div className="my-4 flex flex-col space-y-2">
-      <input
-        className="border p-2"
-        placeholder="Start"
-        value={startSec ?? ""}
-        onChange={(e) => setStartSec(parseFloat(e.target.value))}
-      />
-      <input
-        className="border p-2"
-        placeholder="End"
-        value={endSec ?? ""}
-        onChange={(e) => setEndSec(parseFloat(e.target.value))}
-      />
+      <div className="text-sm">字幕: {initialFront}</div>
+      <div className="font-mono text-sm">
+        Start: {startSec !== null ? startSec.toFixed(2) : ""} End: {endSec !== null ? endSec.toFixed(2) : ""}
+      </div>
       <input
         className="border p-2"
         placeholder="表面テキスト"
