@@ -7,6 +7,7 @@ import {
   createDeck,
   deleteDeck,
   deleteCard,
+  createCard,
   exportDeck,
   fetchVideoTitle,
 } from "./services/api";
@@ -30,6 +31,8 @@ function App() {
   const [captions, setCaptions] = useState([]);
   const [selected, setSelected] = useState(null);
   const [player, setPlayer] = useState(null);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(0);
 
   // ── デッキ一覧取得 ────────────────────────────
   useEffect(() => {
@@ -77,6 +80,21 @@ function App() {
       })
       .catch(() => setVideoTitle(""));
   }, [videoId]);
+
+  // ── プレイヤーの現在時刻更新 ─────────────────────
+  useEffect(() => {
+    if (!player) return;
+    const id = setInterval(() => {
+      setEndTime(player.getCurrentTime());
+    }, 500);
+    return () => clearInterval(id);
+  }, [player]);
+
+  const handlePlayerStateChange = (state) => {
+    if (state === 1 && player) {
+      setStartTime(player.getCurrentTime());
+    }
+  };
 
 
   // ── イベントハンドラ ───────────────────────────
@@ -131,6 +149,12 @@ function App() {
           fetchDecks().then(setDecks);
         }}
         onExport={handleExportDeck}
+        onDeleteCard={async (id) => {
+          await deleteCard(id);
+          fetchCards(currentDeck).then((cs) =>
+            setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec)),
+          );
+        }}
       />
 
       {/* 選択中のデッキ名 */}
@@ -162,7 +186,54 @@ function App() {
           key={videoId}
           videoId={videoId}
           onReady={setPlayer}
+          onStateChange={handlePlayerStateChange}
         />
+      )}
+
+      {player && (
+        <div className="flex items-center space-x-4">
+          <label className="font-mono text-sm flex items-center space-x-1">
+            <span>Start:</span>
+            <input
+              type="number"
+              step="0.1"
+              className="border px-1 w-20 text-right"
+              value={startTime !== null ? startTime.toFixed(2) : ""}
+              onChange={(e) => setStartTime(parseFloat(e.target.value) || 0)}
+            />
+          </label>
+          <label className="font-mono text-sm flex items-center space-x-1">
+            <span>End:</span>
+            <input
+              type="number"
+              step="0.1"
+              className="border px-1 w-20 text-right"
+              value={endTime.toFixed(2)}
+              onChange={(e) => setEndTime(parseFloat(e.target.value) || 0)}
+            />
+          </label>
+          {currentDeck && (
+            <button
+              className="bg-green-500 text-white px-3 py-1 rounded"
+              onClick={async () => {
+                if (startTime === null) return;
+                await createCard({
+                  deckId: currentDeck,
+                  videoId,
+                  timeSec: startTime,
+                  frontText: startTime.toFixed(2),
+                  backText: endTime.toFixed(2),
+                  thumbnail: null,
+                });
+                fetchCards(currentDeck).then((cs) =>
+                  setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec)),
+                );
+              }}
+            >
+              作成
+            </button>
+          )}
+        </div>
       )}
 
 
@@ -198,36 +269,6 @@ function App() {
         />
       )}
 
-      {/* カード一覧 & エクスポート */}
-      {currentDeck && (
-        <>
-          <h2 className="text-xl">Cards</h2>
-          <ul className="list-disc pl-5 space-y-1">
-            {cards.map((c) => (
-              <li key={c.id} className="flex justify-between items-center">
-                <span>
-                  [{c.id}] {c.frontText} → {c.backText}
-                </span>
-                <button
-                  className="text-red-500"
-                  onClick={async () => {
-                    await deleteCard(c.id);
-                    fetchCards(currentDeck).then((cs) =>
-                      setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec))
-                    );
-                  }}
-                >
-                  削除
-                </button>
-              </li>
-            ))}
-          </ul>
-          <ExportButton
-            deckId={currentDeck}
-            deckName={decks.find((d) => d.id === currentDeck)?.name || "deck"}
-          />
-        </>
-      )}
     </div>
   );
 }

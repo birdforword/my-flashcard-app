@@ -1,6 +1,7 @@
 // backend/src/services/cardService.js
 
 import Card from "../models/cardModel.js"; // ← モデルをインポート
+import Deck from "../models/deckModel.js";
 
 /**
  * 新しいカードを追加
@@ -8,6 +9,10 @@ import Card from "../models/cardModel.js"; // ← モデルをインポート
  * @returns {Promise<Card>}
  */
 export async function addCard(data) {
+  const deck = await Deck.findByPk(data.deckId);
+  if (!deck) {
+    throw new Error("Deck not found");
+  }
   return await Card.create(data);
 }
 

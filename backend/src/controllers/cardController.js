@@ -18,6 +18,9 @@ export async function createCard(req, res) {
     });
     return res.status(201).json(card);
   } catch (error) {
+    if (error.message === "Deck not found") {
+      return res.status(404).json({ error: "Deck not found" });
+    }
     console.error("Card creation error:", error);
     return res.status(500).json({ error: "Failed to create card" });
   }

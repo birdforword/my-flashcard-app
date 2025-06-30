@@ -9,6 +9,7 @@ export default function DeckList({
   onSelect,
   onDelete,
   onExport,
+  onDeleteCard,
 }) {
   return (
     <div className="mb-4">
@@ -41,8 +42,21 @@ export default function DeckList({
             {deck.id === currentDeck && cards.length > 0 && (
               <ul className="list-disc pl-5 space-y-1 mt-1">
                 {cards.map((c) => (
-                  <li key={c.id}>
-                    [{c.id}] {c.frontText} → {c.backText}
+                  <li
+                    key={c.id}
+                    className="flex justify-between items-center"
+                  >
+                    <span>
+                      [{c.id}] {c.frontText} → {c.backText}
+                    </span>
+                    {onDeleteCard && (
+                      <button
+                        className="text-red-500"
+                        onClick={() => onDeleteCard(c.id)}
+                      >
+                        削除
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>
