@@ -199,17 +199,6 @@ function App() {
           </div>
           <div className="font-mono text-sm flex items-center space-x-1">
             <span>End:</span>
-<<<<<<< ours
-            <input
-              type="number"
-              step="0.1"
-              className="border px-1 w-20 text-right"
-              value={endTime.toFixed(2)}
-              onChange={(e) => setEndTime(parseFloat(e.target.value) || 0)}
-            />
-          </label>
-          {/* カード自動作成ボタンは削除 */}
-=======
             <span className="px-1 w-20 text-right">{endTime.toFixed(2)}</span>
           </div>
           {currentDeck && (
@@ -233,7 +222,6 @@ function App() {
               作成
             </button>
           )}
->>>>>>> theirs
         </div>
       )}
 
