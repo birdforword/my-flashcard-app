@@ -8,5 +8,5 @@ export async function addCard(data) {
 }
 
 export async function getAllCards() {
-  return await Card.findAll();
+  return await Card.findAll({ order: [["startSec", "ASC"]] });
 }

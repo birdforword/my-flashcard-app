@@ -28,8 +28,6 @@ function App() {
   const [captions, setCaptions] = useState([]);
   const [selected, setSelected] = useState(null);
   const [player, setPlayer] = useState(null);
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(0);
   const [capturedStartSec, setCapturedStartSec] = useState(null);
   const [capturedEndSec, setCapturedEndSec] = useState(null);
 
@@ -89,7 +87,7 @@ function App() {
   useEffect(() => {
     if (!player) return;
     const id = setInterval(() => {
-      setEndTime(player.getCurrentTime());
+      setCapturedEndSec(player.getCurrentTime());
     }, 500);
     return () => clearInterval(id);
   }, [player]);
@@ -98,7 +96,6 @@ function App() {
     if (player) {
       if (state === 1) {
         const t = player.getCurrentTime();
-        setStartTime(t);
         setCapturedStartSec(t);
       } else if (state === 2) {
         const t = player.getCurrentTime();
@@ -206,12 +203,14 @@ function App() {
           <div className="font-mono text-sm flex items-center space-x-1">
             <span>Start:</span>
             <span className="px-1 w-20 text-right">
-              {startTime !== null ? startTime.toFixed(2) : ""}
+              {capturedStartSec !== null ? capturedStartSec.toFixed(2) : ""}
             </span>
           </div>
           <div className="font-mono text-sm flex items-center space-x-1">
             <span>End:</span>
-            <span className="px-1 w-20 text-right">{endTime.toFixed(2)}</span>
+            <span className="px-1 w-20 text-right">
+              {capturedEndSec !== null ? capturedEndSec.toFixed(2) : ""}
+            </span>
           </div>
         </div>
       )}

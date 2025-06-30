@@ -58,13 +58,13 @@ export default function CardForm({
     <div className="my-4 flex flex-col space-y-2">
       <input
         className="border p-2"
-        placeholder="開始秒"
+        placeholder="Start"
         value={startSec ?? ""}
         onChange={(e) => setStartSec(parseFloat(e.target.value))}
       />
       <input
         className="border p-2"
-        placeholder="終了秒"
+        placeholder="End"
         value={endSec ?? ""}
         onChange={(e) => setEndSec(parseFloat(e.target.value))}
       />

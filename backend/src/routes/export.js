@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
   try {
     const deckId = req.query.deckId ? parseInt(req.query.deckId, 10) : null;
     const where = deckId ? { deckId } : {};
-    const cards = await Card.findAll({ where });
+  const cards = await Card.findAll({ where, order: [["startSec", "ASC"]] });
     let deckName = "Video Flashcards Deck";
     if (deckId) {
       const deck = await Deck.findByPk(deckId);
