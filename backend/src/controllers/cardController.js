@@ -7,11 +7,11 @@ import * as cardService from "../services/cardService.js";
  */
 export async function createCard(req, res) {
   try {
-    const { deckId, videoId, timeSec, endSec, frontText, backText, thumbnail } = req.body;
+    const { deckId, videoId, startSec, endSec, frontText, backText, thumbnail } = req.body;
     const card = await cardService.addCard({
       deckId,
       videoId,
-      timeSec,
+      startSec,
       endSec,
       frontText,
       backText,

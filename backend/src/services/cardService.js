@@ -5,7 +5,11 @@ import Deck from "../models/deckModel.js";
 
 /**
  * 新しいカードを追加
+<<<<<<< ours
  * @param {{ videoId:string, timeSec:number|null, endSec:number|null, frontText:string, backText:string, thumbnail:string|null }} data
+=======
+ * @param {{ videoId:string, startSec:number|null, endSec:number|null, frontText:string, backText:string, thumbnail:string|null }} data
+>>>>>>> theirs
  * @returns {Promise<Card>}
  */
 export async function addCard(data) {
@@ -21,7 +25,7 @@ export async function addCard(data) {
  * @returns {Promise<Card[]>}
  */
 export async function getAllCards(where = {}) {
-  return await Card.findAll({ where, order: [["timeSec", "ASC"]] });
+  return await Card.findAll({ where, order: [["startSec", "ASC"]] });
 }
 
 export async function deleteCard(id) {

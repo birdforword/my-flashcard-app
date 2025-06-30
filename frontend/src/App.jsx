@@ -42,7 +42,7 @@ function App() {
     fetchHealth().then(setStatus);
     if (currentDeck) {
       fetchCards(currentDeck).then((cs) =>
-        setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec))
+        setCards(cs.slice().sort((a, b) => a.startSec - b.startSec))
       );
     } else {
       setCards([]);
@@ -148,7 +148,7 @@ function App() {
         onDeleteCard={async (id) => {
           await deleteCard(id);
           fetchCards(currentDeck).then((cs) =>
-            setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec)),
+            setCards(cs.slice().sort((a, b) => a.startSec - b.startSec)),
           );
         }}
       />
@@ -198,6 +198,28 @@ function App() {
             <span>End:</span>
             <span className="px-1 w-20 text-right">{endTime.toFixed(2)}</span>
           </div>
+          {currentDeck && (
+            <button
+              className="bg-green-500 text-white px-3 py-1 rounded"
+              onClick={async () => {
+                if (startTime === null) return;
+                await createCard({
+                  deckId: currentDeck,
+                  videoId,
+                  startSec: startTime,
+                  endSec: endTime,
+                  frontText: startTime.toFixed(2),
+                  backText: endTime.toFixed(2),
+                  thumbnail: null,
+                });
+                fetchCards(currentDeck).then((cs) =>
+                  setCards(cs.slice().sort((a, b) => a.startSec - b.startSec)),
+                );
+              }}
+            >
+              作成
+            </button>
+          )}
         </div>
       )}
 
@@ -220,11 +242,13 @@ function App() {
           deckId={currentDeck}
           videoId={videoId}
           initialFront={selected?.text || ""}
-          startSec={startTime}
-          endSec={endTime}
+          initialStartSec={selected?.offset || null}
+          initialEndSec={
+            selected ? selected.offset + selected.duration : null
+          }
           onCreated={() =>
             fetchCards(currentDeck).then((cs) =>
-              setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec))
+              setCards(cs.slice().sort((a, b) => a.startSec - b.startSec))
             )
           }
         />

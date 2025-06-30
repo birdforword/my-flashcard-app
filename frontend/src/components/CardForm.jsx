@@ -9,14 +9,24 @@ export default function CardForm({
   startSec = null,
   endSec = null,
   initialFront = "",
+  initialStartSec = null,
+  initialEndSec = null,
 }) {
   const [front, setFront] = useState(initialFront);
   const [back, setBack] = useState("");
+  const [startSec, setStartSec] = useState(initialStartSec);
+  const [endSec, setEndSec] = useState(initialEndSec);
 
   // props が変わったとき同期
   useEffect(() => {
     setFront(initialFront);
   }, [initialFront]);
+  useEffect(() => {
+    setStartSec(initialStartSec);
+  }, [initialStartSec]);
+  useEffect(() => {
+    setEndSec(initialEndSec);
+  }, [initialEndSec]);
 
   const submit = async () => {
     if (!deckId) {
@@ -27,7 +37,7 @@ export default function CardForm({
       await createCard({
         deckId,
         videoId,
-        timeSec: startSec,
+        startSec,
         endSec,
         frontText: front,
         backText: back,
@@ -36,6 +46,8 @@ export default function CardForm({
       // フォームクリア
       setFront("");
       setBack("");
+      setStartSec(null);
+      setEndSec(null);
       // 上位でカード一覧を再取得
       onCreated();
     } catch (err) {
@@ -46,6 +58,18 @@ export default function CardForm({
 
   return (
     <div className="my-4 flex flex-col space-y-2">
+      <input
+        className="border p-2"
+        placeholder="開始秒"
+        value={startSec ?? ""}
+        onChange={(e) => setStartSec(parseFloat(e.target.value))}
+      />
+      <input
+        className="border p-2"
+        placeholder="終了秒"
+        value={endSec ?? ""}
+        onChange={(e) => setEndSec(parseFloat(e.target.value))}
+      />
       <input
         className="border p-2"
         placeholder="表面テキスト"
