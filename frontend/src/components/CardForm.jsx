@@ -6,8 +6,6 @@ export default function CardForm({
   deckId,
   onCreated,
   videoId,
-  startSec = null,
-  endSec = null,
   initialFront = "",
   initialStartSec = null,
   initialEndSec = null,
