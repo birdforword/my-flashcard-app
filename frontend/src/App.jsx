@@ -198,22 +198,6 @@ function App() {
         <UploadSubtitles onParsed={handleUpload} />
       )}
 
-      {player && (
-        <div className="flex items-center space-x-4">
-          <div className="font-mono text-sm flex items-center space-x-1">
-            <span>Start:</span>
-            <span className="px-1 w-20 text-right">
-              {capturedStartSec !== null ? capturedStartSec.toFixed(2) : ""}
-            </span>
-          </div>
-          <div className="font-mono text-sm flex items-center space-x-1">
-            <span>End:</span>
-            <span className="px-1 w-20 text-right">
-              {capturedEndSec !== null ? capturedEndSec.toFixed(2) : ""}
-            </span>
-          </div>
-        </div>
-      )}
 
       {videoId && captions.length > 0 && (
         <>
