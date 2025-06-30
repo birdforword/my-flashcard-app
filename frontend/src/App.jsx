@@ -6,6 +6,7 @@ import {
   fetchDecks,
   createDeck,
   deleteDeck,
+  deleteCard,
   exportDeck,
   fetchVideoTitle,
 } from "./services/api";
@@ -76,7 +77,6 @@ function App() {
       })
       .catch(() => setVideoTitle(""));
   }, [videoId]);
-
 
 
   // ── イベントハンドラ ───────────────────────────
@@ -164,7 +164,6 @@ function App() {
           onReady={setPlayer}
         />
       )}
-
 
 
       {/* 自動取得 or 手動アップロード */}
