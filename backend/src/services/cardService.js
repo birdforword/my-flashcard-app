@@ -6,11 +6,7 @@ import crypto from "crypto";
 
 /**
  * 新しいカードを追加
-<<<<<<< ours
- * @param {{ videoId:string, timeSec:number|null, endSec:number|null, frontText:string, backText:string, thumbnail:string|null }} data
-=======
  * @param {{ videoId:string, startSec:number|null, endSec:number|null, frontText:string, backText:string, thumbnail:string|null }} data
->>>>>>> theirs
  * @returns {Promise<Card>}
  */
 export async function addCard(data) {

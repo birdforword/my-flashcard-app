@@ -47,7 +47,8 @@ export default function DeckList({
                     className="flex justify-between items-center"
                   >
                     <span>
-                      [{c.id}] {c.frontText} → {c.backText}
+                      Start: {c.startSec?.toFixed(2)} / End: {c.endSec?.toFixed(2)}
+                      {" "}Front: {c.frontText} / Back: {c.backText}
                     </span>
                     {onDeleteCard && (
                       <button

@@ -7,7 +7,6 @@ import {
   createDeck,
   deleteDeck,
   deleteCard,
-  createCard,
   exportDeck,
   fetchVideoTitle,
 } from "./services/api";
@@ -31,6 +30,8 @@ function App() {
   const [player, setPlayer] = useState(null);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(0);
+  const [capturedStartSec, setCapturedStartSec] = useState(null);
+  const [capturedEndSec, setCapturedEndSec] = useState(null);
 
   // ── デッキ一覧取得 ────────────────────────────
   useEffect(() => {
@@ -77,6 +78,13 @@ function App() {
       .catch(() => {});
   }, [videoId, decks]);
 
+  // Reset captured times when video changes
+  useEffect(() => {
+    setCapturedStartSec(null);
+    setCapturedEndSec(null);
+    setSelected(null);
+  }, [videoId]);
+
   // ── プレイヤーの現在時刻更新 ─────────────────────
   useEffect(() => {
     if (!player) return;
@@ -87,8 +95,15 @@ function App() {
   }, [player]);
 
   const handlePlayerStateChange = (state) => {
-    if (state === 1 && player) {
-      setStartTime(player.getCurrentTime());
+    if (player) {
+      if (state === 1) {
+        const t = player.getCurrentTime();
+        setStartTime(t);
+        setCapturedStartSec(t);
+      } else if (state === 2) {
+        const t = player.getCurrentTime();
+        setCapturedEndSec(t);
+      }
     }
   };
 
@@ -198,28 +213,6 @@ function App() {
             <span>End:</span>
             <span className="px-1 w-20 text-right">{endTime.toFixed(2)}</span>
           </div>
-          {currentDeck && (
-            <button
-              className="bg-green-500 text-white px-3 py-1 rounded"
-              onClick={async () => {
-                if (startTime === null) return;
-                await createCard({
-                  deckId: currentDeck,
-                  videoId,
-                  startSec: startTime,
-                  endSec: endTime,
-                  frontText: startTime.toFixed(2),
-                  backText: endTime.toFixed(2),
-                  thumbnail: null,
-                });
-                fetchCards(currentDeck).then((cs) =>
-                  setCards(cs.slice().sort((a, b) => a.startSec - b.startSec)),
-                );
-              }}
-            >
-              作成
-            </button>
-          )}
         </div>
       )}
 
@@ -231,6 +224,8 @@ function App() {
             onSelect={(c) => {
               setSelected(c);
               player?.seekTo(c.offset, true);
+              setCapturedStartSec(c.offset);
+              setCapturedEndSec(c.offset + c.duration);
             }}
           />
         </>
@@ -242,10 +237,8 @@ function App() {
           deckId={currentDeck}
           videoId={videoId}
           initialFront={selected?.text || ""}
-          initialStartSec={selected?.offset || null}
-          initialEndSec={
-            selected ? selected.offset + selected.duration : null
-          }
+          initialStartSec={capturedStartSec}
+          initialEndSec={capturedEndSec}
           onCreated={() =>
             fetchCards(currentDeck).then((cs) =>
               setCards(cs.slice().sort((a, b) => a.startSec - b.startSec))

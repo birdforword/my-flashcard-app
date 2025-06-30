@@ -11,7 +11,6 @@ const Card = sequelize.define(
     frontText: DataTypes.TEXT,
     backText: DataTypes.TEXT,
     thumbnail: DataTypes.STRING,
-    hash: { type: DataTypes.STRING, allowNull: false, unique: true },
     deckId: { type: DataTypes.INTEGER, allowNull: false },
   },
   {
