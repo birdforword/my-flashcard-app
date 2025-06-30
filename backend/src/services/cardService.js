@@ -2,6 +2,7 @@
 
 import Card from "../models/cardModel.js"; // ← モデルをインポート
 import Deck from "../models/deckModel.js";
+import crypto from "crypto";
 
 /**
  * 新しいカードを追加
@@ -17,7 +18,11 @@ export async function addCard(data) {
   if (!deck) {
     throw new Error("Deck not found");
   }
-  return await Card.create(data);
+  const hash = crypto
+    .createHash("sha256")
+    .update(`${Date.now()}-${data.deckId}-${Math.random()}`)
+    .digest("hex");
+  return await Card.create({ ...data, hash });
 }
 
 /**
