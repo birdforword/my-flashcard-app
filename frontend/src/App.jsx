@@ -17,7 +17,6 @@ import UploadSubtitles from "./components/UploadSubtitles";
 import CaptionsList from "./components/CaptionsList";
 import DeckList from "./components/DeckList";
 import CardForm from "./components/CardForm";
-import ExportButton from "./components/ExportButton";
 
 function App() {
   const [status, setStatus] = useState("");
@@ -79,7 +78,7 @@ function App() {
         }
       })
       .catch(() => setVideoTitle(""));
-  }, [videoId]);
+  }, [videoId, decks]);
 
   // ── プレイヤーの現在時刻更新 ─────────────────────
   useEffect(() => {
@@ -163,6 +162,9 @@ function App() {
           デッキ: {decks.find((d) => d.id === currentDeck)?.name}
         </h2>
       )}
+      {videoTitle && (
+        <p className="text-lg">動画タイトル: {videoTitle}</p>
+      )}
 
       {/* YouTube URL/ID 検索フォーム */}
       <div className="flex items-center space-x-2">
@@ -188,6 +190,11 @@ function App() {
           onReady={setPlayer}
           onStateChange={handlePlayerStateChange}
         />
+      )}
+
+      {/* 自動取得 or 手動アップロード */}
+      {videoId && captions.length === 0 && (
+        <UploadSubtitles onParsed={handleUpload} />
       )}
 
       {player && (
@@ -236,11 +243,6 @@ function App() {
         </div>
       )}
 
-
-      {/* 自動取得 or 手動アップロード */}
-      {videoId && captions.length === 0 && (
-        <UploadSubtitles onParsed={handleUpload} />
-      )}
       {videoId && captions.length > 0 && (
         <>
           <SubtitleOverlay player={player} captions={captions} />
