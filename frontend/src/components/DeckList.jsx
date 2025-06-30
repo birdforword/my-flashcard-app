@@ -1,66 +1,70 @@
 // frontend/src/components/DeckList.jsx
-import { useState } from 'react';
+// デッキの一覧を表示するだけのシンプルなコンポーネント
+import React from "react";
 
 export default function DeckList({
   decks,
+  currentDeck,
+  cards,
   onSelect,
-  onCreate,
-  onDeleteDeck,
-  onDeleteCard
+  onDelete,
+  onExport,
+  onDeleteCard,
 }) {
-  const [name, setName] = useState('');
   return (
     <div className="mb-4">
       <h2 className="text-lg font-bold mb-2">デッキ一覧</h2>
-      <ul className="list-disc pl-5 mb-2 space-y-2">
-        {decks.map(deck => (
-          <li key={deck.id}>
-            <div className="flex justify-between">
+      <ul className="list-disc pl-5 mb-2">
+        {decks.map((deck) => (
+          <li key={deck.id} className="mb-2">
+            <div className="flex justify-between items-center">
               <span
                 className="cursor-pointer text-blue-600 hover:underline"
                 onClick={() => onSelect(deck.id)}
               >
-                {deck.name}
+                {deck.name} ({deck.Cards.length})
               </span>
-              <button
-                className="text-red-500"
-                onClick={() => onDeleteDeck(deck.id)}
-              >
-                削除
-              </button>
+              <div className="space-x-2">
+                <button
+                  className="text-green-600"
+                  onClick={() => onExport(deck)}
+                >
+                  作成
+                </button>
+                <button
+                  className="text-red-500"
+                  onClick={() => onDelete(deck.id)}
+                >
+                  削除
+                </button>
+              </div>
             </div>
-            <ul className="ml-4 list-disc space-y-1">
-              {deck.Cards.map(card => (
-                <li key={card.id} className="flex justify-between">
-                  <span>
-                    [{card.timeSec}s] {card.frontText} → {card.backText}
-                  </span>
-                  <button
-                    className="text-red-500"
-                    onClick={() => onDeleteCard(card.id)}
+            {deck.id === currentDeck && cards.length > 0 && (
+              <ul className="list-disc pl-5 space-y-1 mt-1">
+                {cards.map((c) => (
+                  <li
+                    key={c.id}
+                    className="flex justify-between items-center"
                   >
-                    削除
-                  </button>
-                </li>
-              ))}
-            </ul>
+                    <span>
+                      Start: {c.startSec?.toFixed(2)} / End: {c.endSec?.toFixed(2)}
+                      {" "}Front: {c.frontText} / Back: {c.backText}
+                    </span>
+                    {onDeleteCard && (
+                      <button
+                        className="text-red-500"
+                        onClick={() => onDeleteCard(c.id)}
+                      >
+                        削除
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ul>
-      <div className="flex space-x-2">
-        <input
-          value={name}
-          onChange={e => setName(e.target.value)}
-          placeholder="新しいデッキ名"
-          className="border p-1 flex-1"
-        />
-        <button
-          className="bg-green-500 text-white px-3"
-          onClick={() => { onCreate(name); setName(''); }}
-        >
-          作成
-        </button>
-      </div>
     </div>
   );
 }

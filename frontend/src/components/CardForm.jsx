@@ -1,61 +1,76 @@
 // frontend/src/components/CardForm.jsx
-import { useState, useEffect } from 'react';
-import { createCard } from '../services/api';
+import { useState, useEffect } from "react";
+import { createCard } from "../services/api";
 
 export default function CardForm({
-  deckId,               // ← 追加
+  deckId,
   onCreated,
   videoId,
-  initialFront = '',
-  initialTimeSec = null
+  initialFront = "",
+  initialStartSec = null,
+  initialEndSec = null,
 }) {
-  const [front,   setFront]   = useState(initialFront);
-  const [back,    setBack]    = useState('');
-  const [timeSec, setTimeSec] = useState(initialTimeSec);
+  const [front, setFront] = useState(initialFront);
+  const [back, setBack] = useState("");
+  const [startSec, setStartSec] = useState(initialStartSec);
+  const [endSec, setEndSec] = useState(initialEndSec);
 
   // props が変わったとき同期
-  useEffect(() => { setFront(initialFront); },   [initialFront]);
-  useEffect(() => { setTimeSec(initialTimeSec); }, [initialTimeSec]);
+  useEffect(() => {
+    setFront(initialFront);
+  }, [initialFront]);
+  useEffect(() => {
+    setStartSec(initialStartSec);
+  }, [initialStartSec]);
+  useEffect(() => {
+    setEndSec(initialEndSec);
+  }, [initialEndSec]);
 
   const submit = async () => {
     if (!deckId) {
-      alert('カードを追加するデッキが選択されていません');
+      alert("カードを追加するデッキが選択されていません");
       return;
     }
     try {
       await createCard({
-        deckId,       // ← ここで必ず deckId を渡す
+        deckId,
         videoId,
-        timeSec,
+        startSec,
+        endSec,
         frontText: front,
-        backText:  back,
+        backText: back,
         thumbnail: null,
       });
       // フォームクリア
-      setFront(''); 
-      setBack(''); 
-      setTimeSec(null);
+      setFront("");
+      setBack("");
+      setStartSec(null);
+      setEndSec(null);
       // 上位でカード一覧を再取得
       onCreated();
     } catch (err) {
-      console.error('カード作成エラー', err);
-      alert('カードの作成に失敗しました');
+      console.error("カード作成エラー", err);
+      alert("カードの作成に失敗しました");
     }
   };
 
   return (
     <div className="my-4 flex flex-col space-y-2">
+      <div className="text-sm">字幕: {initialFront}</div>
+      <div className="font-mono text-sm">
+        Start: {startSec !== null ? startSec.toFixed(2) : ""} End: {endSec !== null ? endSec.toFixed(2) : ""}
+      </div>
       <input
         className="border p-2"
         placeholder="表面テキスト"
         value={front}
-        onChange={e => setFront(e.target.value)}
+        onChange={(e) => setFront(e.target.value)}
       />
       <input
         className="border p-2"
         placeholder="裏面テキスト"
         value={back}
-        onChange={e => setBack(e.target.value)}
+        onChange={(e) => setBack(e.target.value)}
       />
       <button
         className="bg-blue-500 text-white px-4 py-2 rounded"
