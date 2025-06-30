@@ -53,16 +53,6 @@ export async function deleteCard(req, res) {
   }
 }
 
-export async function deleteCard(req, res) {
-  try {
-    await cardService.deleteCard(req.params.id);
-    return res.status(204).end();
-  } catch (error) {
-    console.error('Delete card error:', error);
-    return res.status(500).json({ error: 'Failed to delete card' });
-  }
-}
-
 export async function deleteCardsByDeck(req, res) {
   try {
     const { deckId } = req.query;

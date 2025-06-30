@@ -24,10 +24,18 @@ export async function getAllCards(where = {}) {
   return await Card.findAll({ where, order: [["startSec", "ASC"]] });
 }
 
+/**
+ * 単一カードを削除
+ * @param {number|string} id
+ */
 export async function deleteCard(id) {
   return await Card.destroy({ where: { id } });
 }
 
+/**
+ * デッキ内のカードを一括削除
+ * @param {number|string} deckId
+ */
 export async function deleteCardsByDeck(deckId) {
   return await Card.destroy({ where: { deckId } });
 }
@@ -39,21 +47,5 @@ export async function deleteCardsByDeck(deckId) {
  */
 export async function getCardsByDeck(deckId) {
   return await Card.findAll({ where: { deckId } });
-}
-
-/**
- * 単一カードを削除
- * @param {number|string} id
- */
-export async function deleteCard(id) {
-  await Card.destroy({ where: { id } });
-}
-
-/**
- * デッキ内のカードを一括削除
- * @param {number|string} deckId
- */
-export async function deleteCardsByDeck(deckId) {
-  await Card.destroy({ where: { deckId } });
 }
 
