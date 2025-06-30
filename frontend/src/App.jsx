@@ -156,15 +156,7 @@ function App() {
         }}
       />
 
-      {/* 選択中のデッキ名 */}
-      {currentDeck && (
-        <h2 className="text-xl font-semibold">
-          デッキ: {decks.find((d) => d.id === currentDeck)?.name}
-        </h2>
-      )}
-      {videoTitle && (
-        <p className="text-lg">動画タイトル: {videoTitle}</p>
-      )}
+      {/* 選択中のデッキ名と動画タイトルは表示しない */}
 
       {/* YouTube URL/ID 検索フォーム */}
       <div className="flex items-center space-x-2">
@@ -199,18 +191,15 @@ function App() {
 
       {player && (
         <div className="flex items-center space-x-4">
-          <label className="font-mono text-sm flex items-center space-x-1">
+          <div className="font-mono text-sm flex items-center space-x-1">
             <span>Start:</span>
-            <input
-              type="number"
-              step="0.1"
-              className="border px-1 w-20 text-right"
-              value={startTime !== null ? startTime.toFixed(2) : ""}
-              onChange={(e) => setStartTime(parseFloat(e.target.value) || 0)}
-            />
-          </label>
-          <label className="font-mono text-sm flex items-center space-x-1">
+            <span className="px-1 w-20 text-right">
+              {startTime !== null ? startTime.toFixed(2) : ""}
+            </span>
+          </div>
+          <div className="font-mono text-sm flex items-center space-x-1">
             <span>End:</span>
+<<<<<<< ours
             <input
               type="number"
               step="0.1"
@@ -219,6 +208,10 @@ function App() {
               onChange={(e) => setEndTime(parseFloat(e.target.value) || 0)}
             />
           </label>
+          {/* カード自動作成ボタンは削除 */}
+=======
+            <span className="px-1 w-20 text-right">{endTime.toFixed(2)}</span>
+          </div>
           {currentDeck && (
             <button
               className="bg-green-500 text-white px-3 py-1 rounded"
@@ -240,6 +233,7 @@ function App() {
               作成
             </button>
           )}
+>>>>>>> theirs
         </div>
       )}
 
