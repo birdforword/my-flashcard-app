@@ -37,3 +37,14 @@ export async function listCards(req, res) {
     return res.status(500).json({ error: "Failed to retrieve cards" });
   }
 }
+
+export async function deleteCard(req, res) {
+  try {
+    const { id } = req.params;
+    await cardService.deleteCard(id);
+    return res.status(204).end();
+  } catch (error) {
+    console.error("Delete card error:", error);
+    return res.status(500).json({ error: "Failed to delete card" });
+  }
+}

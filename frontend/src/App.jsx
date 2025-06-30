@@ -7,6 +7,7 @@ import {
   createDeck,
   deleteDeck,
   createCard,
+  deleteCard,
   exportDeck,
   fetchVideoTitle,
 } from "./services/api";
@@ -42,7 +43,9 @@ function App() {
   useEffect(() => {
     fetchHealth().then(setStatus);
     if (currentDeck) {
-      fetchCards(currentDeck).then(setCards);
+      fetchCards(currentDeck).then((cs) =>
+        setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec))
+      );
     } else {
       setCards([]);
     }
@@ -62,9 +65,15 @@ function App() {
       .then(async (title) => {
         setVideoTitle(title);
         try {
-          const deck = await createDeck(title);
-          setCurrentDeck(deck.id);
-          fetchDecks().then(setDecks);
+          const existing = decks.find((d) => d.name === title);
+          if (existing) {
+            // Skip creation and use the existing deck
+            setCurrentDeck(existing.id);
+          } else {
+            const deck = await createDeck(title);
+            setCurrentDeck(deck.id);
+            fetchDecks().then(setDecks);
+          }
         } catch {
           // デッキ作成に失敗した場合でもタイトルは保持する
         }
@@ -121,7 +130,9 @@ function App() {
     });
     setStartTime(start);
     setEndTime(end);
-    fetchCards(currentDeck).then(setCards);
+    fetchCards(currentDeck).then((cs) =>
+      setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec))
+    );
   };
 
   const handleExportDeck = async (deck) => {
@@ -148,6 +159,8 @@ function App() {
       {/* デッキ一覧 */}
       <DeckList
         decks={decks}
+        currentDeck={currentDeck}
+        cards={cards}
         onSelect={(id) => setCurrentDeck(id)}
         onDelete={async (id) => {
           await deleteDeck(id);
@@ -238,7 +251,11 @@ function App() {
           videoId={videoId}
           initialFront={selected?.text || ""}
           initialTimeSec={selected?.offset || null}
-          onCreated={() => fetchCards(currentDeck).then(setCards)}
+          onCreated={() =>
+            fetchCards(currentDeck).then((cs) =>
+              setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec))
+            )
+          }
         />
       )}
 
@@ -248,8 +265,21 @@ function App() {
           <h2 className="text-xl">Cards</h2>
           <ul className="list-disc pl-5 space-y-1">
             {cards.map((c) => (
-              <li key={c.id}>
-                [{c.id}] {c.frontText} → {c.backText}
+              <li key={c.id} className="flex justify-between items-center">
+                <span>
+                  [{c.id}] {c.frontText} → {c.backText}
+                </span>
+                <button
+                  className="text-red-500"
+                  onClick={async () => {
+                    await deleteCard(c.id);
+                    fetchCards(currentDeck).then((cs) =>
+                      setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec))
+                    );
+                  }}
+                >
+                  削除
+                </button>
               </li>
             ))}
           </ul>

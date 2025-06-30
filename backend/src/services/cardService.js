@@ -15,6 +15,14 @@ export async function addCard(data) {
  * すべてのカードを取得
  * @returns {Promise<Card[]>}
  */
-export async function getAllCards() {
-  return await Card.findAll();
+export async function getAllCards(where = {}) {
+  return await Card.findAll({ where, order: [["timeSec", "ASC"]] });
+}
+
+export async function deleteCard(id) {
+  return await Card.destroy({ where: { id } });
+}
+
+export async function deleteCardsByDeck(deckId) {
+  return await Card.destroy({ where: { deckId } });
 }

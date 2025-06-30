@@ -22,8 +22,20 @@ export async function listDecks(req, res) {
 
 export async function createDeck(req, res) {
   const { name } = req.body;
-  const deck = await Deck.create({ name });
-  res.status(201).json(deck);
+  try {
+    // Check if a deck with the same name already exists
+    let deck = await Deck.findOne({ where: { name } });
+    if (deck) {
+      // Return existing deck without creating a new one
+      return res.status(200).json(deck);
+    }
+
+    deck = await Deck.create({ name });
+    return res.status(201).json(deck);
+  } catch (err) {
+    console.error("Deck creation error:", err);
+    return res.status(500).json({ error: "Failed to create deck" });
+  }
 }
 
 export async function deleteDeck(req, res) {

@@ -2,30 +2,51 @@
 // デッキの一覧を表示するだけのシンプルなコンポーネント
 import React from "react";
 
-export default function DeckList({ decks, onSelect, onDelete, onExport }) {
+export default function DeckList({
+  decks,
+  currentDeck,
+  cards,
+  onSelect,
+  onDelete,
+  onExport,
+}) {
   return (
     <div className="mb-4">
       <h2 className="text-lg font-bold mb-2">デッキ一覧</h2>
       <ul className="list-disc pl-5 mb-2">
         {decks.map((deck) => (
-          <li key={deck.id} className="flex justify-between items-center">
-            <span
-              className="cursor-pointer text-blue-600 hover:underline"
-              onClick={() => onSelect(deck.id)}
-            >
-              {deck.name} ({deck.Cards.length})
-            </span>
-            <div className="space-x-2">
-              <button
-                className="text-green-600"
-                onClick={() => onExport(deck)}
+          <li key={deck.id} className="mb-2">
+            <div className="flex justify-between items-center">
+              <span
+                className="cursor-pointer text-blue-600 hover:underline"
+                onClick={() => onSelect(deck.id)}
               >
-                作成
-              </button>
-              <button className="text-red-500" onClick={() => onDelete(deck.id)}>
-                削除
-              </button>
+                {deck.name} ({deck.Cards.length})
+              </span>
+              <div className="space-x-2">
+                <button
+                  className="text-green-600"
+                  onClick={() => onExport(deck)}
+                >
+                  作成
+                </button>
+                <button
+                  className="text-red-500"
+                  onClick={() => onDelete(deck.id)}
+                >
+                  削除
+                </button>
+              </div>
             </div>
+            {deck.id === currentDeck && cards.length > 0 && (
+              <ul className="list-disc pl-5 space-y-1 mt-1">
+                {cards.map((c) => (
+                  <li key={c.id}>
+                    [{c.id}] {c.frontText} → {c.backText}
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
         ))}
       </ul>

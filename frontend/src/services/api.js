@@ -27,3 +27,4 @@ export const createDeck = (name) =>
   api.post("/decks", { name }).then((r) => r.data);
 export const deleteDeck = (id) => api.delete(`/decks/${id}`);
 export const deleteCardsByDeck = (id) => api.delete(`/cards?deckId=${id}`);
+export const deleteCard = (id) => api.delete(`/cards/${id}`);
