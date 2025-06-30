@@ -26,7 +26,6 @@ function App() {
 
   const [inputText, setInputText] = useState("");
   const [videoId, setVideoId] = useState("");
-  const [videoTitle, setVideoTitle] = useState("");
   const [captions, setCaptions] = useState([]);
   const [selected, setSelected] = useState(null);
   const [player, setPlayer] = useState(null);
@@ -54,7 +53,6 @@ function App() {
   useEffect(() => {
     if (!videoId) {
       setCaptions([]);
-      setVideoTitle("");
       return;
     }
     fetchCaptions(videoId, "en")
@@ -62,7 +60,6 @@ function App() {
       .catch(() => setCaptions([]));
     fetchVideoTitle(videoId)
       .then(async (title) => {
-        setVideoTitle(title);
         try {
           const existing = decks.find((d) => d.name === title);
           if (existing) {
@@ -77,7 +74,7 @@ function App() {
           // デッキ作成に失敗した場合でもタイトルは保持する
         }
       })
-      .catch(() => setVideoTitle(""));
+      .catch(() => {});
   }, [videoId, decks]);
 
   // ── プレイヤーの現在時刻更新 ─────────────────────
@@ -201,27 +198,6 @@ function App() {
             <span>End:</span>
             <span className="px-1 w-20 text-right">{endTime.toFixed(2)}</span>
           </div>
-          {currentDeck && (
-            <button
-              className="bg-green-500 text-white px-3 py-1 rounded"
-              onClick={async () => {
-                if (startTime === null) return;
-                await createCard({
-                  deckId: currentDeck,
-                  videoId,
-                  timeSec: startTime,
-                  frontText: startTime.toFixed(2),
-                  backText: endTime.toFixed(2),
-                  thumbnail: null,
-                });
-                fetchCards(currentDeck).then((cs) =>
-                  setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec)),
-                );
-              }}
-            >
-              作成
-            </button>
-          )}
         </div>
       )}
 
@@ -244,7 +220,8 @@ function App() {
           deckId={currentDeck}
           videoId={videoId}
           initialFront={selected?.text || ""}
-          initialTimeSec={selected?.offset || null}
+          startSec={startTime}
+          endSec={endTime}
           onCreated={() =>
             fetchCards(currentDeck).then((cs) =>
               setCards(cs.slice().sort((a, b) => a.timeSec - b.timeSec))

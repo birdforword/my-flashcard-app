@@ -7,6 +7,7 @@ const Card = sequelize.define(
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     videoId: DataTypes.STRING,
     timeSec: DataTypes.FLOAT,
+    endSec: DataTypes.FLOAT,
     frontText: DataTypes.TEXT,
     backText: DataTypes.TEXT,
     thumbnail: DataTypes.STRING,

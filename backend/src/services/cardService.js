@@ -5,7 +5,7 @@ import Deck from "../models/deckModel.js";
 
 /**
  * 新しいカードを追加
- * @param {{ videoId:string, timeSec:number|null, frontText:string, backText:string, thumbnail:string|null }} data
+ * @param {{ videoId:string, timeSec:number|null, endSec:number|null, frontText:string, backText:string, thumbnail:string|null }} data
  * @returns {Promise<Card>}
  */
 export async function addCard(data) {

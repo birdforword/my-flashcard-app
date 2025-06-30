@@ -3,23 +3,20 @@ import { useState, useEffect } from "react";
 import { createCard } from "../services/api";
 
 export default function CardForm({
-  deckId, // ← 追加
+  deckId,
   onCreated,
   videoId,
+  startSec = null,
+  endSec = null,
   initialFront = "",
-  initialTimeSec = null,
 }) {
   const [front, setFront] = useState(initialFront);
   const [back, setBack] = useState("");
-  const [timeSec, setTimeSec] = useState(initialTimeSec);
 
   // props が変わったとき同期
   useEffect(() => {
     setFront(initialFront);
   }, [initialFront]);
-  useEffect(() => {
-    setTimeSec(initialTimeSec);
-  }, [initialTimeSec]);
 
   const submit = async () => {
     if (!deckId) {
@@ -28,9 +25,10 @@ export default function CardForm({
     }
     try {
       await createCard({
-        deckId, // ← ここで必ず deckId を渡す
+        deckId,
         videoId,
-        timeSec,
+        timeSec: startSec,
+        endSec,
         frontText: front,
         backText: back,
         thumbnail: null,
@@ -38,7 +36,6 @@ export default function CardForm({
       // フォームクリア
       setFront("");
       setBack("");
-      setTimeSec(null);
       // 上位でカード一覧を再取得
       onCreated();
     } catch (err) {
