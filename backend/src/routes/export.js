@@ -2,6 +2,7 @@
 import express from "express";
 import AnkiExportPkg from "anki-apkg-export";
 const AnkiExport = AnkiExportPkg.default; // CommonJS の default export を受け取る
+import crypto from "crypto";
 
 import Card from "../models/cardModel.js";
 import Deck from "../models/deckModel.js";
@@ -12,7 +13,7 @@ router.get("/", async (req, res) => {
   try {
     const deckId = req.query.deckId ? parseInt(req.query.deckId, 10) : null;
     const where = deckId ? { deckId } : {};
-  const cards = await Card.findAll({ where, order: [["startSec", "ASC"]] });
+    const cards = await Card.findAll({ where, order: [["startSec", "ASC"]] });
     let deckName = "Video Flashcards Deck";
     if (deckId) {
       const deck = await Deck.findByPk(deckId);
@@ -24,16 +25,34 @@ router.get("/", async (req, res) => {
 
     // Deck を作成（第一引数はファイル名になり、スペースは大丈夫）
     const apkg = new AnkiExport(deckName, {
-      fields: ["Start", "End"],
+      // "hash", "Front", "End", "Lang_you", "Lang_target", "Start_sec", "End_sec"
+      fields: [
+        "hash",
+        "Front",
+        "End",
+        "Lang_you",
+        "Lang_target",
+        "Start_sec",
+        "End_sec",
+      ],
     });
 
     // 各カードを追加
     cards.forEach((c) => {
+      const hash = crypto
+        .createHash("sha1")
+        .update(
+          `${c.videoId ?? ""}-${c.startSec ?? ""}-${c.endSec ?? ""}-${c.frontText ?? ""}-${c.backText ?? ""}`,
+        )
+        .digest("hex");
       apkg.addCard(
-        c.frontText,
-        c.backText,
-        // オプションでタグやメディアを渡せます
-        // { tags: ['video'], media: [ /* Buffer やファイルパス */ ] }
+        hash,
+        c.frontText || "",
+        c.backText || "",
+        c.langYou || "",
+        c.langTarget || "",
+        c.startSec != null ? c.startSec.toString() : "",
+        c.endSec != null ? c.endSec.toString() : "",
       );
     });
 
